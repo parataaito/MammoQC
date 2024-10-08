@@ -297,7 +297,7 @@ Here's a list of features and improvements planned for the MammoQC project:
 
 ## License
 
-This project is licensed under the [insert your chosen license here]. See the `LICENSE` file for details.
+This project is licensed under the MIT Licence. See the `LICENSE` file for details.
 
 
 
