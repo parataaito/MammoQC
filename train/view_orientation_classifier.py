@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 from pytorch_lightning.callbacks import Callback
 import random
 import numpy as np
+import argparse
 
 def set_seeds(seed=42):
     random.seed(seed)
@@ -234,12 +235,12 @@ class MammographyDataModule(pl.LightningDataModule):
     def test_dataloader(self):
         return DataLoader(self.test_dataset, batch_size=self.batch_size)
 
-def main():
+def main(args):
     # Set seeds for reproducibility
-    set_seeds(42)
+    set_seeds(args.seed)
     
     # Set up data module
-    data_module = MammographyDataModule(xml_file='annotations.xml', img_dir=r'D:\Code\dcm2png\png_data', batch_size=32)
+    data_module = MammographyDataModule(xml_file=args.xml_file, img_dir=args.img_dir, batch_size=args.batch_size)
 
     # Set up model
     model = Res2NextLightningModule()
@@ -247,7 +248,7 @@ def main():
     # Set up callbacks
     checkpoint_callback = ModelCheckpoint(
         monitor='val_loss',
-        dirpath='checkpoints',
+        dirpath=args.checkpoint_dir,
         filename='res2next-mammography-{epoch:02d}-{val_loss:.2f}',
         save_top_k=3,
         mode='min'
@@ -256,17 +257,17 @@ def main():
     plot_callback = PlotCallback()
 
     # Set up logger
-    logger = TensorBoardLogger("lightning_logs", name="res2next_mammography_view_orientation")
+    logger = TensorBoardLogger(args.log_dir, name="res2next_mammography_view_orientation")
 
     # Set up trainer
     trainer = pl.Trainer(
-        max_epochs=10,
-        accelerator='auto',
-        devices='auto',
-        callbacks=[checkpoint_callback, print_callback, plot_callback],  # Add plot_callback here
+        max_epochs=args.max_epochs,
+        accelerator=args.accelerator,
+        devices=args.devices,
+        callbacks=[checkpoint_callback, print_callback, plot_callback],
         logger=logger,
         enable_progress_bar=True,
-        log_every_n_steps=1
+        log_every_n_steps=args.log_every_n_steps
     )
 
     # Train the model
@@ -285,4 +286,17 @@ def main():
     trainer.test(best_model, datamodule=data_module)
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Train and evaluate a mammography view and orientation classifier")
+    parser.add_argument("--xml_file", type=str, default="annotations.xml", help="Path to the XML annotation file")
+    parser.add_argument("--img_dir", type=str, default="D:\\Code\\dcm2png\\png_data", help="Directory containing the image data")
+    parser.add_argument("--batch_size", type=int, default=32, help="Batch size for training and evaluation")
+    parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility")
+    parser.add_argument("--checkpoint_dir", type=str, default="checkpoints", help="Directory to save model checkpoints")
+    parser.add_argument("--log_dir", type=str, default="lightning_logs", help="Directory for TensorBoard logs")
+    parser.add_argument("--max_epochs", type=int, default=100, help="Maximum number of training epochs")
+    parser.add_argument("--accelerator", type=str, default="auto", help="Accelerator type")
+    parser.add_argument("--devices", type=str, default="auto", help="Number of devices to use")
+    parser.add_argument("--log_every_n_steps", type=int, default=1, help="Log every N steps")
+    
+    args = parser.parse_args()
+    main(args)

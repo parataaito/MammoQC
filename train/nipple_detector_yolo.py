@@ -1,30 +1,39 @@
 from ultralytics import YOLO
+import argparse
 
-if __name__ == "__main__":
-# Load a larger model
-    # model = YOLO('yolov8m.pt')  # medium-sized model for better accuracy
-    model = YOLO('train/yolo11m.pt')  # medium-sized model for better accuracy
+def main(args):
+    # Load the model
+    model = YOLO(args.model)
 
-    # Train the model with adjusted parameters
-    # results = model.train(
-    #     data="D:/Data/datasets/vindr_yolo/data.yaml",
-    #     epochs=200,  # Increase number of epochs
-    #     imgsz=640,   # Increase image size
-    #     batch=16,    # Adjust batch size based on your GPU memory
-    #     lr0=1e-6,    # Lower initial learning rate
-    #     lrf=1e-4,    # Final learning rate
-    #     warmup_epochs=5,  # Warmup epochs
-    #     augment=True,  # Enable built-in augmentations
-    #     workers=8,
-    #     patience=50,  # Early stopping patience
-    # )
-    model.train(data="D:/Data/datasets/vindr_yolo/data.yaml", imgsz=640, epochs=200, batch=32, lr0=1e-5, workers=8)
+    # Train the model
+    model.train(
+        data=args.data,
+        imgsz=args.imgsz,
+        epochs=args.epochs,
+        batch=args.batch,
+        lr0=args.lr0,
+        workers=args.workers
+    )
 
     # Validate the model
     metrics = model.val()
 
     # Export the model
-    success = model.export(format="onnx")
+    success = model.export(format=args.export_format)
 
     print(f"Validation metrics: {metrics}")
     print(f"Model export successful: {success}")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Train and validate a YOLO model for nipple detection")
+    parser.add_argument("--model", type=str, default="train/yolo11m.pt", help="Path to the YOLO model")
+    parser.add_argument("--data", type=str, default="D:/Data/datasets/vindr_yolo/data.yaml", help="Path to the data configuration file")
+    parser.add_argument("--imgsz", type=int, default=640, help="Image size for training")
+    parser.add_argument("--epochs", type=int, default=200, help="Number of training epochs")
+    parser.add_argument("--batch", type=int, default=32, help="Batch size for training")
+    parser.add_argument("--lr0", type=float, default=1e-5, help="Initial learning rate")
+    parser.add_argument("--workers", type=int, default=8, help="Number of worker threads for data loading")
+    parser.add_argument("--export_format", type=str, default="onnx", help="Format to export the model (e.g., 'onnx', 'torchscript')")
+    
+    args = parser.parse_args()
+    main(args)
