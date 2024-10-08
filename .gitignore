@@ -1,0 +1,8 @@
+venv
+runs
+lightning_logs
+checkpoints
+preprocessing
+**/*.pth
+**/*.ckpt
+**/*_pycache*
