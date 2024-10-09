@@ -2,6 +2,9 @@
 
 MammoQC is a comprehensive tool for mammography quality control and analysis. It includes three main components: nipple detection, pectoral muscle segmentation, and view-orientation classification. This project uses advanced deep learning techniques to analyze mammogram images and provide valuable insights for medical professionals.
 
+<img src="docs/images/mammoqc_exemple1.png" width="500" height="300">
+<img src="docs/images/mammoqc_exemple2.png" width="500" height="300">
+
 ## Table of Contents
 - [Features](#features)
 - [Installation](#installation)
@@ -19,6 +22,7 @@ MammoQC is a comprehensive tool for mammography quality control and analysis. It
 1. **Nipple Detection**: Utilizes YOLOv8 to accurately locate nipples in mammogram images.
 2. **Pectoral Muscle Segmentation**: Implements a U-Net architecture to segment pectoral muscles in mammograms.
 3. **View-Orientation Classification**: Uses a Res2Next model to classify mammogram views (CC/MLO) and orientations (Left/Right).
+4. **Pectoral Nipple Distance**: Combine multiple models and image processing techniques to determine the PND
 
 ## Installation
 
@@ -61,30 +65,9 @@ MammoQC is a comprehensive tool for mammography quality control and analysis. It
 
 [Image Processing Documentation](processing/README.md)
 
-## Project Structure
+## User Interface
 
-```
-MammoQC/
-├── checkpoints/
-├── inference/
-│   ├── inference_imgs/
-│   ├── nipple_detection_inference.py
-│   ├── pectoral_muscle_segmentation_inference.py
-│   └── view_orientation_clasiffication_inference.py
-├── lightning_logs/
-├── preprocessing/
-├── runs/
-├── train/
-│   ├── nipple_detector_yolo.py
-│   ├── pectoral_muscle_segmentator_512.py
-│   └── view_orientation_classifier.py
-├── venv/
-├── .gitignore
-├── annotations.xml
-├── LICENSE
-├── README.md
-└── yolov8m.pt
-```
+[MammoQC App](ui/README.md)
 
 ## Dependencies
 
@@ -108,10 +91,10 @@ For a complete list of dependencies and their versions, please refer to the `req
 Here's a list of features and improvements planned for the MammoQC project:
 
 ### Data Preprocessing
-- [ ] Package the preprocessing pipeline for the VINDR dataset
-  - [ ] Create a script to download and extract the VINDR dataset
-  - [ ] Implement automatic data preprocessing steps (DICOM to PNG conversion, masks creation, etc.)
-  - [ ] Document the preprocessing steps in detail
+- [x] Package the preprocessing pipeline for the VINDR dataset
+  - [x] Create a script to download and extract the VINDR dataset
+  - [x] Implement automatic data preprocessing steps (DICOM to PNG conversion, masks creation, etc.)
+  - [x] Document the preprocessing steps in detail
 
 ### Algorithm Development
 - [ ] Create a full algorithm for Patient Position Quality Control

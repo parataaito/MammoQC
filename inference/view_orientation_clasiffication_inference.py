@@ -13,17 +13,26 @@ from train.view_orientation_classifier import Res2NextLightningModule
 
 def load_model(checkpoint_path):
     # Load the model to CPU first
-    model = Res2NextLightningModule.load_from_checkpoint(checkpoint_path, map_location=torch.device('cpu'))
+    model = Res2NextLightningModule.load_from_checkpoint(checkpoint_path, map_location=torch.device('cuda'))
     model.eval()
     return model
 
-def preprocess_image(image_path):
+def preprocess_image_from_path(image_path):
     transform = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
     image = Image.open(image_path).convert('RGB')
+    return transform(image).unsqueeze(0)
+
+def preprocess_image_from_numpy(image):
+    transform = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ])
+    image = image.convert('RGB')
     return transform(image).unsqueeze(0)
 
 def predict(model, image_tensor):
@@ -60,7 +69,7 @@ def main():
             image_path = os.path.join(args.image_dir, image_file)
             
             # Preprocess the image
-            image_tensor = preprocess_image(image_path)
+            image_tensor = preprocess_image_from_path(image_path)
             
             # Make prediction
             view, orientation, view_probs, orientation_probs = predict(model, image_tensor)

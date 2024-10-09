@@ -7,10 +7,47 @@ def pectoral_nipple_distance(img, mask, xtl, ytl, xbr, ybr, orientation, view):
     assert view in ["CC", "MLO"], "Invalid view. Must be 'CC' or 'MLO'."
     assert orientation in ["Left", "Right"], "Invalid orientation. Must be 'Left' or 'Right'."
     
+    rows, cols, x, y, slope, intercept, x_nipple, y_nipple, perp_slope, perp_intercept, x_intersect, y_intersect, distance = compute_pnd(mask, xtl, ytl, xbr, ybr, orientation, view)
+    
+    img_color = draw_pnd_on_image(img, xtl, ytl, xbr, ybr, view, rows, cols, x, y, slope, intercept, x_nipple, y_nipple, perp_slope, perp_intercept, x_intersect, y_intersect)
+    
+    return img_color, (x_intersect, y_intersect), distance
+
+def draw_pnd_on_image(img, xtl, ytl, xbr, ybr, view, rows, cols, x, y, slope, intercept, x_nipple, y_nipple, perp_slope, perp_intercept, x_intersect, y_intersect):
     # Create a color version of the image for drawing
     img_color = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+
+    # Draw L1
+    if slope == float('inf'):
+        cv2.line(img_color, (int(intercept), 0), (int(intercept), rows-1), (0, 0, 255), 2)
+    else:
+        y1 = int(slope * 0 + intercept)
+        y2 = int(slope * (cols-1) + intercept)
+        cv2.line(img_color, (0, y1), (cols-1, y2), (0, 0, 255), 2)
+   
+    # Draw L2
+    if perp_slope == float('inf'):
+        cv2.line(img_color, (x_nipple, 0), (x_nipple, rows-1), (0, 255, 0), 2)
+    else:
+        y1 = int(perp_slope * 0 + perp_intercept)
+        y2 = int(perp_slope * (cols-1) + perp_intercept)
+        cv2.line(img_color, (0, y1), (cols-1, y2), (0, 255, 0), 2)
     
-    rows, cols = img.shape
+    # Draw points
+    cv2.circle(img_color, (x_nipple, y_nipple), 5, (255, 0, 0), -1)  # N (Nipple)
+    cv2.circle(img_color, (x_intersect, y_intersect), 5, (0, 255, 255), -1)  # P (Intersection)
+    
+    # Draw bounding box
+    cv2.rectangle(img_color, (int(xtl), int(ytl)), (int(xbr), int(ybr)), (255, 0, 255), 2)
+    
+    # Draw edge pixels (only for MLO view)
+    if view != "CC":
+        for pixel in zip(y, x):
+            cv2.circle(img_color, (pixel[1], pixel[0]), 1, (255, 255, 0), -1)
+    return img_color
+
+def compute_pnd(mask, xtl, ytl, xbr, ybr, orientation, view):
+    rows, cols = mask.shape
     
     if view == "CC":  # For CC view, don't use the mask
         # Use the first or last column of the image as L1 based on orientation
@@ -25,7 +62,7 @@ def pectoral_nipple_distance(img, mask, xtl, ytl, xbr, ybr, orientation, view):
         # Keep only the leftmost or rightmost white pixel for each row based on orientation
         edge_pixels = []
         for row in range(rows):
-            white_pixels = np.where(mask[row] == 255)[0]
+            white_pixels = np.where(mask[row] >= 1)[0]
             if len(white_pixels) > 0:
                 if orientation == "Right":
                     edge_pixels.append((row, white_pixels[0]))  # Leftmost pixel
@@ -70,37 +107,7 @@ def pectoral_nipple_distance(img, mask, xtl, ytl, xbr, ybr, orientation, view):
     
     # Calculate distance between N and P
     distance = np.sqrt((x_intersect - x_nipple)**2 + (y_intersect - y_nipple)**2)
-    
-    # Draw on the image
-    # Draw L1
-    if slope == float('inf'):
-        cv2.line(img_color, (int(intercept), 0), (int(intercept), rows-1), (0, 0, 255), 2)
-    else:
-        y1 = int(slope * 0 + intercept)
-        y2 = int(slope * (cols-1) + intercept)
-        cv2.line(img_color, (0, y1), (cols-1, y2), (0, 0, 255), 2)
-   
-    # Draw L2
-    if perp_slope == float('inf'):
-        cv2.line(img_color, (x_nipple, 0), (x_nipple, rows-1), (0, 255, 0), 2)
-    else:
-        y1 = int(perp_slope * 0 + perp_intercept)
-        y2 = int(perp_slope * (cols-1) + perp_intercept)
-        cv2.line(img_color, (0, y1), (cols-1, y2), (0, 255, 0), 2)
-    
-    # Draw points
-    cv2.circle(img_color, (x_nipple, y_nipple), 5, (255, 0, 0), -1)  # N (Nipple)
-    cv2.circle(img_color, (x_intersect, y_intersect), 5, (0, 255, 255), -1)  # P (Intersection)
-    
-    # Draw bounding box
-    cv2.rectangle(img_color, (int(xtl), int(ytl)), (int(xbr), int(ybr)), (255, 0, 255), 2)
-    
-    # Draw edge pixels (only for MLO view)
-    if view != "CC":
-        for pixel in zip(y, x):
-            cv2.circle(img_color, (pixel[1], pixel[0]), 1, (255, 255, 0), -1)
-    
-    return img_color, (x_intersect, y_intersect), distance
+    return rows, cols, x, y, slope, intercept, x_nipple, y_nipple, perp_slope, perp_intercept, x_intersect, y_intersect,distance
 
 def main(args):
     # Load the image and mask
