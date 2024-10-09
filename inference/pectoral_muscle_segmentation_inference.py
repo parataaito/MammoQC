@@ -10,7 +10,7 @@ import argparse
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(project_root)
 
-from train.pectoral_muscle_segmentator_512 import PectoralSegmentation
+from train.pectoral_muscle_segmentator import PectoralSegmentation
 
 def load_model(checkpoint_path):
     # Determine if CUDA is available
