@@ -3,10 +3,9 @@ import cv2
 from scipy import stats
 import argparse
 
-def pectoral_nipple_distance(img_path, mask_path, xtl, ytl, xbr, ybr, orientation, view):
-    # Load the image and mask
-    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE) if view != "CC" else None
+def pectoral_nipple_distance(img, mask, xtl, ytl, xbr, ybr, orientation, view):
+    assert view in ["CC", "MLO"], "Invalid view. Must be 'CC' or 'MLO'."
+    assert orientation in ["Left", "Right"], "Invalid orientation. Must be 'Left' or 'Right'."
     
     # Create a color version of the image for drawing
     img_color = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
@@ -101,17 +100,15 @@ def pectoral_nipple_distance(img_path, mask_path, xtl, ytl, xbr, ybr, orientatio
         for pixel in zip(y, x):
             cv2.circle(img_color, (pixel[1], pixel[0]), 1, (255, 255, 0), -1)
     
-    # Add text labels
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    cv2.putText(img_color, 'N', (x_nipple+10, y_nipple), font, 0.5, (255, 0, 0), 2)
-    cv2.putText(img_color, 'P', (x_intersect+10, y_intersect), font, 0.5, (0, 255, 255), 2)
-    cv2.putText(img_color, f'Mammogram Analysis - {orientation} {view}', (10, 30), font, 1, (255, 255, 255), 2)
-    
     return img_color, (x_intersect, y_intersect), distance
 
 def main(args):
+    # Load the image and mask
+    img = cv2.imread(args.img_path, cv2.IMREAD_GRAYSCALE)
+    mask = cv2.imread(args.mask_path, cv2.IMREAD_GRAYSCALE) if args.view != "CC" else None
+    
     img_color, intersection_point, distance = pectoral_nipple_distance(
-        args.img_path, args.mask_path, args.xtl, args.ytl, args.xbr, args.ybr, 
+        img, mask, args.xtl, args.ytl, args.xbr, args.ybr, 
         args.orientation, args.view
     )
     print(f"Intersection point P: {intersection_point}")

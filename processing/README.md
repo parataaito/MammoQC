@@ -33,14 +33,14 @@ MammoQC includes a feature to calculate the Pectoral Nipple Distance (PND), an i
 The script now uses command-line arguments for flexible usage:
 
 ```
-python logics/pnd.py --img_path <path_to_image> --mask_path <path_to_mask> 
+python processing/pnd.py --img_path <path_to_image> --mask_path <path_to_mask> 
                      --xtl <x_top_left> --ytl <y_top_left> --xbr <x_bottom_right> --ybr <y_bottom_right> 
                      --orientation <Right/Left> --view <CC/MLO>
 ```
 
 Arguments:
 - `img_path`: Path to the mammogram image
-- `mask_path`: Path to the mask image (not used for CC view)
+- `mask_path`: Path to the pectoral muscle mask image (not used for CC view)
 - `xtl`, `ytl`, `xbr`, `ybr`: Coordinates of the nipple bounding box
 - `orientation`: "Right" or "Left"
 - `view`: "CC" or "MLO"
