@@ -3,7 +3,10 @@ import cv2
 from scipy import stats
 import argparse
 
-def pectoral_nipple_distance(img, mask, xtl, ytl, xbr, ybr, orientation, view):  
+def pectoral_nipple_distance(img, mask, xtl, ytl, xbr, ybr, orientation, view):
+    assert view in ["CC", "MLO"], "Invalid view. Must be 'CC' or 'MLO'."
+    assert orientation in ["Left", "Right"], "Invalid orientation. Must be 'Left' or 'Right'."
+    
     # Create a color version of the image for drawing
     img_color = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
     
