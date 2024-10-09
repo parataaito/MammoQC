@@ -23,12 +23,21 @@ def load_model(checkpoint_path):
     model.eval()
     return model, device
 
-def preprocess_image(image_path, device, target_size=(512, 512)):
+def preprocess_image_from_path(image_path, device, target_size=(512, 512)):
     transform = transforms.Compose([
         transforms.Resize(target_size),
         transforms.ToTensor(),
     ])
     image = Image.open(image_path).convert('L')  # Convert to grayscale
+    image = transform(image).unsqueeze(0)  # Add batch dimension
+    return image.to(device)
+
+def preprocess_image_from_numpy(image, device, target_size=(512, 512)):
+    transform = transforms.Compose([
+        transforms.Resize(target_size),
+        transforms.ToTensor(),
+    ])
+    image = image.convert('L')  # Convert to grayscale
     image = transform(image).unsqueeze(0)  # Add batch dimension
     return image.to(device)
 
@@ -73,7 +82,7 @@ def main():
             image_path = os.path.join(image_dir, image_file)
             
             # Preprocess the image
-            processed_image = preprocess_image(image_path, device)
+            processed_image = preprocess_image_from_path(image_path, device)
             
             # Make a prediction
             prediction = predict(model, processed_image)
