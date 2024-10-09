@@ -1,5 +1,13 @@
-# MammoQC
+<p align="center"><img align="center" width="280" src="docs/icon.png"/></p>
+<h3 align="center">MammoQC, an open-source Patient Positioning Quality Control tool for X-Ray mammography</h3>
+<hr>
 
+<p align="center">
+  <a href="https://skillicons.dev">
+    <img src="https://skillicons.dev/icons?i=python,pytorch,opencv,qt" />
+  </a>
+</p>
+<hr>
 MammoQC is a comprehensive tool for mammography quality control and analysis. It includes three main components: nipple detection, pectoral muscle segmentation, and view-orientation classification. This project uses advanced deep learning techniques to analyze mammogram images and provide valuable insights for medical professionals.
 
 <img src="docs/images/mammoqc_exemple1.png" width="500" height="300">
@@ -98,7 +106,7 @@ Here's a list of features and improvements planned for the MammoQC project:
 
 ### Algorithm Development
 - [ ] Create a full algorithm for Patient Position Quality Control
-  - [ ] Merge all existing models (view classification, orientation detection, etc.)
+  - [x] Merge all existing models (view classification, orientation detection, etc.)
   - [ ] Implement additional processing steps:
     - [ ] Breast boundary detection
     - [ ] Nipple visibility detection
@@ -107,9 +115,9 @@ Here's a list of features and improvements planned for the MammoQC project:
 
 ### User Interface
 - [ ] Add a user-friendly UI
-  - [ ] Design a clean and intuitive interface
-  - [ ] Implement file upload functionality for mammogram images
-  - [ ] Create a results display page with visualizations
+  - [x] Design a clean and intuitive interface
+  - [x] Implement file upload functionality for mammogram images
+  - [x] Create a results display page with visualizations
   - [ ] Add batch processing capabilities
   - [ ] Implement result saving features
 
