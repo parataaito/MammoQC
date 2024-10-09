@@ -98,7 +98,7 @@ Here's a list of features and improvements planned for the MammoQC project:
 
 ### Algorithm Development
 - [ ] Create a full algorithm for Patient Position Quality Control
-  - [ ] Merge all existing models (view classification, orientation detection, etc.)
+  - [x] Merge all existing models (view classification, orientation detection, etc.)
   - [ ] Implement additional processing steps:
     - [ ] Breast boundary detection
     - [ ] Nipple visibility detection
@@ -107,9 +107,9 @@ Here's a list of features and improvements planned for the MammoQC project:
 
 ### User Interface
 - [ ] Add a user-friendly UI
-  - [ ] Design a clean and intuitive interface
-  - [ ] Implement file upload functionality for mammogram images
-  - [ ] Create a results display page with visualizations
+  - [x] Design a clean and intuitive interface
+  - [x] Implement file upload functionality for mammogram images
+  - [x] Create a results display page with visualizations
   - [ ] Add batch processing capabilities
   - [ ] Implement result saving features
 
