@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 from scipy import stats
+import argparse
 
 def pectoral_nipple_distance(img_path, mask_path, xtl, ytl, xbr, ybr, orientation, view):
     # Load the image and mask
@@ -108,36 +109,24 @@ def pectoral_nipple_distance(img_path, mask_path, xtl, ytl, xbr, ybr, orientatio
     
     return img_color, (x_intersect, y_intersect), distance
 
-if __name__ == "__main__":
-    # List of orientations and views
-    orientations = ["Right", "Left"]
-    views = ["CC", "MLO"]
+def main(args):
+    img_color, intersection_point, distance = pectoral_nipple_distance(
+        args.img_path, args.mask_path, args.xtl, args.ytl, args.xbr, args.ybr, 
+        args.orientation, args.view
+    )
+    print(f"Intersection point P: {intersection_point}")
+    print(f"Distance between N and P: {distance}")
     
-    for orientation in orientations:
-        for view in views:
-            if orientation == "Right" and view == "MLO":
-                img_path = r'D:\Code\dcm2png\png_data\00efff24259203a7f19a2875295e4ba6_04d59c956abf0bc15c0fd6dec47374b5.png'
-                mask_path = r'D:\Code\dcm2png\png_masks\00efff24259203a7f19a2875295e4ba6_04d59c956abf0bc15c0fd6dec47374b5.png'
-                xtl, ytl, xbr, ybr = 1562.39, 2345.40, 1756.72, 2559.83
-            elif orientation == "Left" and view == "MLO":
-                img_path = r'D:\Code\dcm2png\png_data\e8a024b2a99a8b12b25a1e436556d0d2_04afe127c8d6daf4d27d227c64fa8aea.png'
-                mask_path = r'D:\Code\dcm2png\png_masks\e8a024b2a99a8b12b25a1e436556d0d2_04afe127c8d6daf4d27d227c64fa8aea.png'
-                xtl, ytl, xbr, ybr = 839.46, 1840.58, 1008.32, 2057.69
-            elif orientation == "Left" and view == "CC":
-                img_path = r'D:\Code\dcm2png\png_data\033e4f9ee05749cd591c958aa873dc8b_00c3c05f7ff415d71fae16ae999c178d.png'
-                mask_path = r'D:\Code\dcm2png\png_masks\033e4f9ee05749cd591c958aa873dc8b_00c3c05f7ff415d71fae16ae999c178d.png'
-                xtl, ytl, xbr, ybr = 677.86, 1390.51, 805.18, 1544.63
-            else: # orientation == "Right" and view == "CC":
-                img_path = r'D:\Code\dcm2png\png_data\0b0241e1676978a4e5717cb6406f48d1_00dfcde5aaf6cd0aab3c3a0435632b3f.png'
-                mask_path = r'D:\Code\dcm2png\png_masks\0b0241e1676978a4e5717cb6406f48d1_00dfcde5aaf6cd0aab3c3a0435632b3f.png'
-                xtl, ytl, xbr, ybr = 1729.91, 1393.86, 1837.13, 1568.09
-
-            img_color, intersection_point, distance = pectoral_nipple_distance(img_path, mask_path, xtl, ytl, xbr, ybr, orientation, view)
-            print(f"Intersection point P: {intersection_point}")
-            print(f"Distance between N and P: {distance}")
-            
-            # Save the image
-            output_path = f'pnd_{orientation}_{view}.png'
-            cv2.imwrite(output_path, img_color)
-            
-            print(f"Analysis visualization saved as: {output_path}")
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Perform pectoral-nipple distance analysis on mammogram images")
+    parser.add_argument("--img_path", type=str, required=True, help="Path to the mammogram image")
+    parser.add_argument("--mask_path", type=str, required=True, help="Path to the mask image (not used for CC view)")
+    parser.add_argument("--xtl", type=float, required=True, help="X-coordinate of top-left corner of nipple bounding box")
+    parser.add_argument("--ytl", type=float, required=True, help="Y-coordinate of top-left corner of nipple bounding box")
+    parser.add_argument("--xbr", type=float, required=True, help="X-coordinate of bottom-right corner of nipple bounding box")
+    parser.add_argument("--ybr", type=float, required=True, help="Y-coordinate of bottom-right corner of nipple bounding box")
+    parser.add_argument("--orientation", type=str, choices=["Right", "Left"], required=True, help="Orientation of the mammogram")
+    parser.add_argument("--view", type=str, choices=["CC", "MLO"], required=True, help="View of the mammogram")
+    
+    args = parser.parse_args()
+    main(args)
